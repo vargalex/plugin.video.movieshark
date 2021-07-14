@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+	<category label="Keresés">
+		<setting label="Cím" type="text" default="" id="msearch"/>
+		<setting label="Típus" type="enum" id="mtype" values="Mind|Filmek|Sorozatok" default="0"/>
+		<setting label="Rendezési sorrend" type="enum" id="msort" values="Nézettség szerint|ABC sorrendben|Feltöltési idő szerint|IMDB népszerűség szerint" default="0"/>
+		<setting label="Minőség" type="enum" id="mquality" values="Mind|TV-RIP|DVD-RIP|BD-RIP|HD" default="0"/>
+		<setting label="Nyelv" type="enum" id="mlanguage" values="Mind|Feliratos|Szinkronizált" default="0"/>
+		<setting label="Kategória" type="enum" id="mcategory" values="Mind|18+|Akció|Animáció|Anime|Családi|Dokumentum|Ázsiai|Dráma|Életrajzi|Fantasy|Háborús|Horror|Kaland|Krimi|Misztikus|Romantikus|Sci-Fi|TV-Sorozat|Sport|Thriller|Történelmi|Vígjáték|Western|Zenés" default="0"/>
+		<setting label="Év" type="bool" id="myear" default="false"/>
+		<setting label="Bemutatás éve" type="number" id="mfyear" subsetting="true" option="int" />
+	</category>
+</settings>

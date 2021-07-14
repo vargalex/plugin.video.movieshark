@@ -1,0 +1,36 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+    <category label="Tartalom">
+        <setting label="Rendezési sorrend" type="lsep"/>
+        <setting label="Filmek és Sorozatok rendezése" type="enum" id="msort" values="Feltöltési idő|ABC|Nézettség|IMDB pontszám" default="2"/>
+        <setting label="Szűrők" type="lsep"/>
+        <setting label="Minőség" type="enum" id="mquality" values="Mind|TV-RIP|DVD-RIP|BD-RIP|HD" default="0"/>
+        <setting label="Nyelv" type="enum" id="mlanguage" values="Mind|Feliratos|Szinkronizált" default="0"/>
+        <setting label="Kategória" type="enum" id="mcategory" values="Mind|18+|Akció|Animáció|Anime|Családi|Dokumentum|Ázsiai|Dráma|Életrajzi|Fantasy|Háborús|Horror|Kaland|Krimi|Misztikus|Romantikus|Sci-Fi|TV-Sorozat|Sport|Thriller|Történelmi|Vígjáték|Western|Zenés" default="0"/>
+        <setting label="Év" type="bool" id="myear" default="false"/>
+        <setting label="Bemutatás éve" type="number" id="mfyear" subsetting="true" option="int" visible="!eq(-1,false)" default="1950"/>
+        <setting label="Weboldal beállítás" type="lsep"/>
+        <setting label="Weboldal címe:" type="text" id="base_filmezz" default="https://filmezz.eu"/>
+		<setting id="clear_meta" type="action" label="[COLOR blue]Meta adatok törlése[/COLOR]" default="" action="RunPlugin(plugin://plugin.video.movieshark/?mode=clear_meta)"/>
+    </category>
+    <category label="Megjelenítés">
+		<setting label="Főmenü elemek" type="lsep"/>
+		<setting label="Részletes kereső ikon megjelenítése a főmenüben" type="bool" id="dsearch" default="false"/>
+        <setting label="Filmek és Sorozatok megjelenítési módja" type="lsep"/>
+        <setting label="Médiainfo adatok engedélyezése a filmekhez ha elérhető" type="bool" id="TMDB" default="true"/>
+        <setting label="Médiainfo engedélyezése a találati listában" type="bool" id="TMDBMain" default="false" enable="!eq(-1,false)"/>
+		<setting label="Fanart engedélyezése" type="bool" id="fan_art" default="false" enable="!eq(-2,false)"/>
+		<setting label="Előzetes engedélyezése a filmekhez ha elérhető" type="bool" id="trailer" default="true"/>
+        <setting label="TRAKT" type="lsep"/>
+        <setting label="TRAKT.TV engedélyezése" type="bool" id="TRAKT" default="false"/>
+		<setting label="Lejátszás elindulásakor..." type="lsep"/>
+		<setting id="bookmarks" type="bool" label="Lejátszás folytatása" default="true" />
+    </category>
+    <category label="ResolveURL">
+    	<setting id="open_smr_settings" type="action" label="ResolveURL beállítások" enable="true" option="close" action="RunPlugin(plugin://plugin.video.movieshark/?mode=smrSettings)" />
+    </category>
+    <category label="Letöltés">
+        <setting label="Letöltési beállítások" type="lsep"/>
+        <setting label="Mentés helye" type="folder" id="savefolder" source="auto" default="" option="writeable"/>
+    </category>
+</settings>

@@ -1,13 +1,18 @@
 # -*- coding: utf-8 -*-
 
-import os,sys,re,urlparse,json
+import os,sys,re,json,base64
 
 from resources.lib import client
 from resources.lib import control
 
+if sys.version_info[0] == 3:
+    import urllib.parse as urlparse
+else:
+    import urlparse
+
 base_filmezz = control.setting('base_filmezz')
 fanart_tv_art_link = 'http://webservice.fanart.tv/v3/%s/%s'
-fanart_tv_headers = {'api-key': 'YTVmNDlkYjM0ZWJlZmYxZTRmNTIwNjQxYmExYWRjYTU='.decode('base64')}
+fanart_tv_headers = {'api-key': base64.b64decode('YTVmNDlkYjM0ZWJlZmYxZTRmNTIwNjQxYmExYWRjYTU=')}
 tvdb_by_imdb = 'http://thetvdb.com/api/GetSeriesByRemoteID.php?imdbid=%s'
 
 def get(title, url):

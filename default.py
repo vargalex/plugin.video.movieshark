@@ -1,5 +1,5 @@
-import os, sys, urllib, re, urlparse, xbmcaddon, xbmcgui, xbmcplugin, shutil, json, datetime
-import resolveurl as urlresolver
+import os, sys, re, xbmcaddon, xbmcgui, xbmcplugin, shutil, json, datetime
+import urlresolver
 
 from resources.lib import client
 from resources.lib import control
@@ -7,17 +7,26 @@ from resources.lib import fanart
 from resources.lib import metacache
 from resources.lib import views
 from resources.lib import debrid
+from resources.lib.utils import py2_encode, py2_decode
+
+if sys.version_info[0] == 3:
+    from urllib.parse import urlencode, unquote
+    import urllib.parse as urlparse
+    from functools import reduce
+else:
+    from urllib import urlencode, unquote
+    import urlparse
 
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
 thisAddon = xbmcaddon.Addon(id='plugin.video.movieshark')
 addonID = thisAddon.getAddonInfo('id')
-thisAddonDir = xbmc.translatePath(thisAddon.getAddonInfo('path')).decode('utf-8')
+thisAddonDir = py2_decode(xbmc.translatePath(thisAddon.getAddonInfo('path')))
 sys.path.append(os.path.join(thisAddonDir, 'resources', 'lib'))
 sys.path.append(os.path.join(thisAddonDir, 'resources', 'media'))
-MediaDir = xbmc.translatePath(os.path.join(thisAddonDir, 'resources', 'media')).decode('utf-8')
-SettingsDir = xbmc.translatePath(os.path.join(thisAddonDir, 'resources')).decode('utf-8')
-UserDataDir = xbmc.translatePath(thisAddon.getAddonInfo('profile') ).decode('utf-8')
+MediaDir = py2_decode(xbmc.translatePath(os.path.join(thisAddonDir, 'resources', 'media')))
+SettingsDir = py2_decode(xbmc.translatePath(os.path.join(thisAddonDir, 'resources')))
+UserDataDir = py2_decode(xbmc.translatePath(thisAddon.getAddonInfo('profile')))
 
 
 if sys.platform == 'win32':
@@ -90,7 +99,8 @@ def build_kategoriak_directory(foldername, pagenum, action):
         if not category_set[poz][0] == '0':
             try:
                 url = build_url({'mode': 'main_folder', 'foldername': poz, 'pagenum': '0', 'action' : 'none'})
-                li = xbmcgui.ListItem(category_set[poz][1].encode('utf-8'), iconImage=MediaDir + '\\Kategoriak.png')
+                li = xbmcgui.ListItem(py2_encode(category_set[poz][1]))
+                li.setArt({'icon': MediaDir + '\\Kategoriak.png'})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                         listitem=li, isFolder=True)
             except:
@@ -104,7 +114,8 @@ def build_kategoriak_directory(foldername, pagenum, action):
 def build_evek_directory(foldername, pagenum, action):
     for poz in range(1950,datetime.date.today().year+1,1):
         url = build_url({'mode': 'main_folder', 'foldername': poz, 'pagenum': '0', 'action' : 'none'})
-        li = xbmcgui.ListItem(str(poz), iconImage=MediaDir + '\\Evek.png')
+        li = xbmcgui.ListItem(str(poz))
+        li.setArt({'icon': MediaDir + '\\Evek.png'})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                      listitem=li, isFolder=True)
 
@@ -115,12 +126,14 @@ def build_evek_directory(foldername, pagenum, action):
 
 def build_settings_directory():
     url = build_url({'mode': 'open_settings'})
-    li = xbmcgui.ListItem(u'Be\xE1ll\xEDt\xE1sok', iconImage=MediaDir + '\\Beallitasok.png')
+    li = xbmcgui.ListItem(u'Be\xE1ll\xEDt\xE1sok')
+    li.setArt({'icon': MediaDir + '\\Beallitasok.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=False)
 
     url = build_url({'mode': 'viewmodes'})
-    li = xbmcgui.ListItem(u'N\u00E9zet', iconImage=MediaDir + '\\Beallitasok.png')
+    li = xbmcgui.ListItem(u'N\u00E9zet')
+    li.setArt({'icon': MediaDir + '\\Beallitasok.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
@@ -164,7 +177,8 @@ def build_main_directory():
         ssearch_icon = 'KeresesSimple.png'
         ssearch_label = u'Keres\xE9s szimpla'
         url = build_url({'mode': 'main_folder', 'foldername': 'Kereses', 'pagenum': '0', 'action' : 'Firstrun'})
-        li = xbmcgui.ListItem(u'Keres\xE9s', iconImage=MediaDir + '\\Kereses.png')
+        li = xbmcgui.ListItem(u'Keres\xE9s')
+        li.setArt({'icon': MediaDir + '\\Kereses.png'})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                     listitem=li, isFolder=True)
     else:
@@ -172,49 +186,58 @@ def build_main_directory():
         ssearch_label = u'Keres\xE9s'
 
     url = build_url({'mode': 'main_folder', 'foldername': 'Kereses_szimpla', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(ssearch_label, iconImage=MediaDir + '\\' + ssearch_icon)
+    li = xbmcgui.ListItem(ssearch_label)
+    li.setArt({'icon': MediaDir + '\\' + ssearch_icon})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'main_folder', 'foldername': 'Filmek', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'Filmek', iconImage=MediaDir + '\\Filmek.png')
+    li = xbmcgui.ListItem(u'Filmek')
+    li.setArt({'icon': MediaDir + '\\Filmek.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'main_folder', 'foldername': 'Sorozatok', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'Sorozatok', iconImage=MediaDir + '\\Sorozatok.png')
+    li = xbmcgui.ListItem(u'Sorozatok')
+    li.setArt({'icon': MediaDir + '\\Sorozatok.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'kategoriak', 'foldername': 'Kategoriak', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'Kateg\xF3ri\xE1k', iconImage=MediaDir + '\\Kategoriak.png')
+    li = xbmcgui.ListItem(u'Kateg\xF3ri\xE1k')
+    li.setArt({'icon': MediaDir + '\\Kategoriak.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'evek', 'foldername': 'Evek', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'\xC9vsz\xE1mok', iconImage=MediaDir + '\\Evek.png')
+    li = xbmcgui.ListItem(u'\xC9vsz\xE1mok')
+    li.setArt({'icon': MediaDir + '\\Evek.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'main_folder', 'foldername': 'Kedvencek', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'Kedvencek', iconImage=MediaDir + '\\Kedvencek.png')
+    li = xbmcgui.ListItem(u'Kedvencek')
+    li.setArt({'icon': MediaDir + '\\Kedvencek.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
     url = build_url({'mode': 'openPlaylist'})
-    li = xbmcgui.ListItem(u'Lej\xE1tsz\xE1si lista', iconImage=MediaDir + '\\Playlist.png')
+    li = xbmcgui.ListItem(u'Lej\xE1tsz\xE1si lista')
+    li.setArt({'icon': MediaDir + '\\Playlist.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
-    savefolder = control.setting('savefolder').decode('utf-8')
-    if not savefolder == 'Nincs megadva!':
+    savefolder = py2_decode(control.setting('savefolder'))
+    if not savefolder in ['Nincs megadva!', '']:
         url = savefolder
-        li = xbmcgui.ListItem(u'Let\u00F6lt\u00E9sek', iconImage=MediaDir + '\\Kategoriak.png')
+        li = xbmcgui.ListItem(u'Let\u00F6lt\u00E9sek')
+        li.setArt({'icon': MediaDir + '\\Kategoriak.png'})
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                     listitem=li, isFolder=True)
 
     url = build_url({'mode': 'beallitasok', 'foldername': 'Beallitasok', 'pagenum': '0', 'action' : 'none'})
-    li = xbmcgui.ListItem(u'Eszk\u00F6z\u00F6k', iconImage=MediaDir + '\\Beallitasok.png')
+    li = xbmcgui.ListItem(u'Eszk\u00F6z\u00F6k')
+    li.setArt({'icon': MediaDir + '\\Beallitasok.png'})
     xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                 listitem=li, isFolder=True)
 
@@ -311,30 +334,30 @@ def build_movie_directory(foldername, pagenum, action):
 
         url_content = client.request(top_url)
         if not url_content:
-            control.okDialog('Hiba', base_filmezz.decode('utf-8') + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
+            control.okDialog('Hiba', py2_decode(base_filmezz) + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
             return
     
         result = client.parseDOM(url_content, 'ul', attrs={'class': 'row list-unstyled movie-list'})
         items = client.parseDOM(result, 'li', attrs={'class': 'col-md-2.+?'})
-
         for item in items:
             title = client.parseDOM(item, 'span', attrs={'class': 'title'})[0]
-            title = client.replaceHTMLCodes(title).encode('utf-8')
+            title = py2_encode(client.replaceHTMLCodes(title))
 
             link = client.parseDOM(item, 'a', ret='href')[0]
-            link = link.encode('utf-8')
+            link = py2_encode(link)
 
             img = client.parseDOM(item, 'img', ret='src')[0]
-            img = img.encode('utf-8')
+            img = py2_encode(img)
 
             url = build_url({'mode': 'movie_folder', 'foldername': link, 'title': title, 'image': img})
 
             movie_info = client.parseDOM(item, 'ul', attrs={'class': 'list-inline cover-element movie-icons'})[0]
             lang = client.parseDOM(movie_info, 'li', ret='class')[0]
             qual = client.parseDOM(movie_info, 'li', ret='title')[1]
-            movie_info = decode_movie_info(lang.strip().encode('utf-8'), qual.strip().encode('utf-8'))
+            movie_info = decode_movie_info(py2_encode(lang.strip()), py2_encode(qual.strip()))
 
-            li = xbmcgui.ListItem(title + ' | ' + movie_info, iconImage=img)
+            li = xbmcgui.ListItem(title + ' | ' + movie_info)
+            li.setArt({'icon': img})
             file_data = link + '=spl=' + title + '=spl=' + movie_info
             if file_data in watched_file_data:
                 li.setInfo( type='Video', infoLabels={ "Title": title + movie_info, 'playcount': 1, 'overlay': 7})
@@ -351,19 +374,19 @@ def build_movie_directory(foldername, pagenum, action):
                     li.setProperty('fanart_image', poster)
             li.setInfo(type='Video', infoLabels = meta)
             url_conf1 = {'mode': 'main_folder', 'foldername': foldername, 'pagenum': '0', 'action': 'Ujkereses'}
-            favourite_args1 = '?' + urllib.urlencode(url_conf1)
+            favourite_args1 = '?' + urlencode(url_conf1)
 
             url_conf = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'ADDF', 'pagenum' : pagenum}
-            favourite_args = '?' + urllib.urlencode(url_conf)
+            favourite_args = '?' + urlencode(url_conf)
 
             url_conf2 = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'ADDW', 'pagenum' : 'SEARCH'}
-            favourite_args2 = '?' + urllib.urlencode(url_conf2)
+            favourite_args2 = '?' + urlencode(url_conf2)
 
             url_conf3 = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'REMOVEW', 'pagenum' : 'SEARCH'}
-            favourite_args3 = '?' + urllib.urlencode(url_conf3)
+            favourite_args3 = '?' + urlencode(url_conf3)
 
             url_conf4 = {'mode': 'main_folder', 'foldername': 'Kereses_szimpla', 'pagenum': '0', 'action': 'none'}
-            favourite_args4 = '?' + urllib.urlencode(url_conf4)
+            favourite_args4 = '?' + urlencode(url_conf4)
 
             if foldername == 'Kereses':
                 li.addContextMenuItems([ (u'Hozz\xE1ad\xE1s a MovieShark kedvencekhez', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args + ')'),
@@ -381,7 +404,8 @@ def build_movie_directory(foldername, pagenum, action):
 
         if len(items) == 0:
                 url = build_url({'mode': 'main_folder', 'foldername': foldername, 'pagenum': '0', 'action': 'Ujkereses'})
-                li = xbmcgui.ListItem(u'[COLOR red]>> Nincs tal\xE1lat >>[/COLOR]', iconImage=MediaDir + '\\Kereses.png')
+                li = xbmcgui.ListItem(u'[COLOR red]>> Nincs tal\xE1lat >>[/COLOR]')
+                li.setArt({'icon': MediaDir + '\\Kereses.png'})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
                                                         listitem=li, isFolder=False)
 
@@ -390,7 +414,8 @@ def build_movie_directory(foldername, pagenum, action):
                 pagenum -= 1
                 pagenum = str(pagenum)
                 url = build_url({'mode': 'main_folder', 'foldername': foldername, 'pagenum': pagenum, 'action': 'none'})
-                li = xbmcgui.ListItem(u'[COLOR blue]<< El\u0151z\u0151 oldal <<[/COLOR]', iconImage=MediaDir + '\\Elozo.png')
+                li = xbmcgui.ListItem(u'[COLOR blue]<< El\u0151z\u0151 oldal <<[/COLOR]')
+                li.setArt({'icon': MediaDir + '\\Elozo.png'})
                 poster = MediaDir + '\\Elozo.png'
                 li.setArt({'icon': poster, 'thumb': poster, 'poster': poster})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
@@ -405,7 +430,8 @@ def build_movie_directory(foldername, pagenum, action):
                 pagenum = str(pagenum)
 
                 url = build_url({'mode': 'main_folder', 'foldername': foldername, 'pagenum': pagenum, 'action': 'none'})
-                li = xbmcgui.ListItem(u'[COLOR green]>> K\xF6vetkez\u0151 oldal >>[/COLOR]', iconImage=MediaDir + '\\Kovetkezo.png')
+                li = xbmcgui.ListItem(u'[COLOR green]>> K\xF6vetkez\u0151 oldal >>[/COLOR]')
+                li.setArt({'icon': MediaDir + '\\Kovetkezo.png'})
                 poster = MediaDir + '\\Kovetkezo.png'
                 li.setArt({'icon': poster, 'thumb': poster, 'poster': poster})
                 xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
@@ -430,7 +456,7 @@ def build_movie_directory(foldername, pagenum, action):
 
             url_content = client.request(top_url)
             if not url_content:
-                control.okDialog('Hiba', base_filmezz.decode('utf-8') + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
+                control.okDialog('Hiba', py2_decode(base_filmezz) + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
                 return
 
             result = client.parseDOM(url_content, 'ul', attrs={'class': 'row list-unstyled movie-list'})
@@ -438,22 +464,23 @@ def build_movie_directory(foldername, pagenum, action):
 
             for item in items:
                 title = client.parseDOM(item, 'span', attrs={'class': 'title'})[0]
-                title = client.replaceHTMLCodes(title).encode('utf-8')
+                title = py2_encode(client.replaceHTMLCodes(title))
 
                 link = client.parseDOM(item, 'a', ret='href')[0]
-                link = link.encode('utf-8')
+                link = py2_encode(link)
 
                 img = client.parseDOM(item, 'img', ret='src')[0]
-                img = img.encode('utf-8')
+                img = py2_encode(img)
 
                 url = build_url({'mode': 'movie_folder', 'foldername': link, 'title': title, 'image': img})
 
                 movie_info = client.parseDOM(item, 'ul', attrs={'class': 'list-inline cover-element movie-icons'})[0]
                 lang = client.parseDOM(movie_info, 'li', ret='class')[0]
                 qual = client.parseDOM(movie_info, 'li', ret='title')[1]
-                movie_info = decode_movie_info(lang.strip().encode('utf-8'), qual.strip().encode('utf-8'))
+                movie_info = decode_movie_info(py2_encode(lang.strip()), py2_encode(qual.strip()))
 
-                li = xbmcgui.ListItem(title + ' | ' + movie_info, iconImage=img)
+                li = xbmcgui.ListItem(title + ' | ' + movie_info)
+                li.setArt({'icon': img})
                 file_data = link + '=spl=' + title + '=spl=' + movie_info
                 if control.setting('TMDB') == 'true' and control.setting('TMDBMain')=='true':
                     meta = metacache.get(fanart.get, 720, title, link)
@@ -472,13 +499,13 @@ def build_movie_directory(foldername, pagenum, action):
                 li.setInfo(type='Video', infoLabels = meta)
 
                 url_conf = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'ADDF', 'pagenum' : pagenum}
-                favourite_args = '?' + urllib.urlencode(url_conf)
+                favourite_args = '?' + urlencode(url_conf)
 
                 url_conf2 = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'ADDW', 'pagenum' : search_text}
-                favourite_args2 = '?' + urllib.urlencode(url_conf2)
+                favourite_args2 = '?' + urlencode(url_conf2)
 
                 url_conf3 = {'mode': 'favourite', 'foldername': link, 'title': title, 'info': movie_info, 'function': 'REMOVEW', 'pagenum' : search_text}
-                favourite_args3 = '?' + urllib.urlencode(url_conf3)
+                favourite_args3 = '?' + urlencode(url_conf3)
                 li.addContextMenuItems([ (u'Hozz\xE1ad\xE1s a MovieShark kedvencekhez', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args + ')'),
 				(u'Jel\xF6l\xE9s megtekintettk\xE9nt', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args2 + ')'),
 				(u'Megtekintett jel\xF6l\xE9s t\xF6rl\xE9se', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args3 + ')')])
@@ -491,46 +518,50 @@ def build_movie_directory(foldername, pagenum, action):
             return
 
     elif foldername == 'Kedvencek':
-        the_file = open(favourite_file,'r')
-        for line in the_file:
-            movie_data = line.split('=spl=')
-            img = base_filmezz + '/nagykep/' + movie_data[0].split('\/')[-1] + '.jpg'
-            url = build_url({'mode': 'movie_folder', 'foldername': movie_data[0], 'title': movie_data[1], 'image': img})
-            li = xbmcgui.ListItem(movie_data[1] + movie_data[2], iconImage=img)
-            file_data = movie_data[0] + '=spl=' + movie_data[1] + '=spl=' + movie_data[2].replace('\n', '')
-            if control.setting('TMDB') == 'true' and control.setting('TMDBMain')=='true':
-                meta = metacache.get(fanart.get, 720, movie_data[1], movie_data[0])
-            else: meta = {}
-            file_data = movie_data[0] + '=spl=' + movie_data[1] + '=spl=' + movie_data[2].replace('\n', '')
-            if file_data in watched_file_data:
-                meta.update=({ "Title": movie_data[1].decode('utf-8') + movie_data[2], 'playcount': 1, 'overlay': 7})
-            try: poster = meta['poster']
-            except: poster = img
-            li.setArt({'icon': poster, 'thumb': poster, 'poster': poster})
-            if control.setting('fan_art') == 'true':
-                if 'fanart' in meta and not meta['fanart'] == '0':
-                    li.setProperty('fanart_image', meta['fanart'])
-                else:
-                    li.setProperty('fanart_image', poster)
-            li.setInfo(type='Video', infoLabels = meta)
-            url_conf = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2], 'function': 'REMOVEF', 'pagenum' : '0'}
-            favourite_args = '?' + urllib.urlencode(url_conf)
+        if os.path.isfile(favourite_file):
+            the_file = open(favourite_file,'r')
+            for line in the_file:
+                movie_data = line.split('=spl=')
+                img = base_filmezz + '/nagykep/' + movie_data[0].split('\/')[-1] + '.jpg'
+                url = build_url({'mode': 'movie_folder', 'foldername': movie_data[0], 'title': movie_data[1], 'image': img})
+                li = xbmcgui.ListItem(movie_data[1] + movie_data[2])
+                li.setArt({'icon': img})
+                file_data = movie_data[0] + '=spl=' + movie_data[1] + '=spl=' + movie_data[2].replace('\n', '')
+                if control.setting('TMDB') == 'true' and control.setting('TMDBMain')=='true':
+                    meta = metacache.get(fanart.get, 720, movie_data[1], movie_data[0])
+                else: meta = {}
+                file_data = movie_data[0] + '=spl=' + movie_data[1] + '=spl=' + movie_data[2].replace('\n', '')
+                if file_data in watched_file_data:
+                    meta.update=({ "Title": py2_decode(movie_data[1]) + movie_data[2], 'playcount': 1, 'overlay': 7})
+                try: poster = meta['poster']
+                except: poster = img
+                li.setArt({'icon': poster, 'thumb': poster, 'poster': poster})
+                if control.setting('fan_art') == 'true':
+                    if 'fanart' in meta and not meta['fanart'] == '0':
+                        li.setProperty('fanart_image', meta['fanart'])
+                    else:
+                        li.setProperty('fanart_image', poster)
+                li.setInfo(type='Video', infoLabels = meta)
+                url_conf = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2], 'function': 'REMOVEF', 'pagenum' : '0'}
+                favourite_args = '?' + urlencode(url_conf)
 
-            url_conf2 = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2].replace('\n', ''), 'function': 'ADDW', 'pagenum' : '0'}
-            favourite_args2 = '?' + urllib.urlencode(url_conf2)
+                url_conf2 = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2].replace('\n', ''), 'function': 'ADDW', 'pagenum' : '0'}
+                favourite_args2 = '?' + urlencode(url_conf2)
 
-            url_conf3 = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2].replace('\n', ''), 'function': 'REMOVEW', 'pagenum' : '0'}
-            favourite_args3 = '?' + urllib.urlencode(url_conf3)
-            li.addContextMenuItems([ (u'T\xF6rles a MovieShark kedvencekb\u0151l', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args + ')'),
-			    (u'Jel\xF6l\xE9s megtekintettk\xE9nt', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args2 + ')'),
-			    (u'Megtekintett jel\xF6l\xE9s t\xF6rl\xE9se', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args3 + ')')])
+                url_conf3 = {'mode': 'favourite', 'foldername': movie_data[0], 'title': movie_data[1], 'info': movie_data[2].replace('\n', ''), 'function': 'REMOVEW', 'pagenum' : '0'}
+                favourite_args3 = '?' + urlencode(url_conf3)
+                li.addContextMenuItems([ (u'T\xF6rles a MovieShark kedvencekb\u0151l', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args + ')'),
+                    (u'Jel\xF6l\xE9s megtekintettk\xE9nt', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args2 + ')'),
+                    (u'Megtekintett jel\xF6l\xE9s t\xF6rl\xE9se', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args3 + ')')])
 
-            xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
-                                    listitem=li, isFolder=True)
-        control.content(addon_handle, 'movies')
-        xbmcplugin.endOfDirectory(addon_handle, cacheToDisc=True)
+                xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
+                                        listitem=li, isFolder=True)
+            control.content(addon_handle, 'movies')
+            xbmcplugin.endOfDirectory(addon_handle, cacheToDisc=True)
 
-        the_file.close()
+            the_file.close()
+        else:
+            xbmcgui.Dialog().ok("Hiba", "Nincsenek kedvencek!")
   
     views.setView('results', {'skin.estuary': 55, 'skin.confluence': 500})
 
@@ -554,7 +585,7 @@ def find_videourl(foldername, foldertitle, folderimage, isdownload, meta, dname)
     except: year = '0'
 
     u = client.request('{0}/link_to.php?{1}'.format(base_filmezz, foldername), output='geturl')
-    log('MS HOST URL: {} '.format(u.encode('utf-8')))
+    log('MS HOST URL: {} '.format(py2_encode(u)))
 
     direct_url = None
     if dname != 'false':
@@ -572,7 +603,7 @@ def find_videourl(foldername, foldertitle, folderimage, isdownload, meta, dname)
     if not direct_url:
         return
 
-    try: direct_url = direct_url.encode('utf-8')
+    try: direct_url = py2_encode(direct_url)
     except: pass
 
     log('MS DIRECT URL: {} '.format(direct_url))
@@ -607,7 +638,7 @@ def build_movie_links(foldername, foldertitle, folderimage):
 
     url_content = client.request(top_url)
     if not url_content:
-        control.okDialog('Hiba', base_filmezz.decode('utf-8') + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
+        control.okDialog('Hiba', py2_decode(base_filmezz) + u' nem el\u00E9rhet\u0151. Pr\u00F3b\u00E1ld \u00FAjra k\u00E9s\u0151bb.')
         return
 
     vid_id = re.search('''\sfid\s*:\s*['"](\d+)''', url_content).group(1)
@@ -624,10 +655,10 @@ def build_movie_links(foldername, foldertitle, folderimage):
         try:
             h = re.search('/ul>\n?([^<]+)', i)
             if h:
-                host = h.group(1).encode('utf-8').strip().split('.')[0].lower()
+                host = py2_encode(h.group(1)).strip().split('.')[0].lower()
                 host = [x[1] for x in locDict if host == x[0]]
                 if not host: continue
-                filter.append((host[0], i.encode('utf-8')))
+                filter.append((host[0], py2_encode(i)))
         except:
             pass
 
@@ -643,7 +674,8 @@ def build_movie_links(foldername, foldertitle, folderimage):
     try:
         if not control.setting('trailer') == 'true': raise Exception()
         url = build_url({'mode': 'trailer', 'title': foldertitle, 'id': youtube_id})
-        li = xbmcgui.ListItem('[COLOR orange]' + foldertitle.decode('utf-8') + u' EL\u0150ZETES[/COLOR]', iconImage=base_filmezz + '/nagykep/' + folderimage + '.jpg')
+        li = xbmcgui.ListItem('[COLOR orange]' + py2_decode(foldertitle) + u' EL\u0150ZETES[/COLOR]')
+        li.setArt({'icon': base_filmezz + '/nagykep/' + folderimage + '.jpg'})
         li.setArt({'icon': poster, 'thumb': poster, 'poster': poster})
         li.setProperty('fanart_image', meta['fanart'])
         xbmcplugin.addDirectoryItem(handle=addon_handle, url=url,
@@ -657,14 +689,14 @@ def build_movie_links(foldername, foldertitle, folderimage):
         try:
             host = item[0]
             adurl = client.parseDOM(item[1], 'a', ret='href')[-1]
-            try: adurl = urllib.unquote(adurl).encode('utf-8')
+            try: adurl = py2_encode(unquote(adurl))
             except:
-                log('Error unquote: {0}, URL: {1}'.format(e.message, adurl.encode('utf-8')))
+                log('Error unquote: {0}, URL: {1}'.format(e.message, py2_encode(adurl)))
             subs = adurl.find('http', 1)
             watch_id = adurl
             if subs > 1: watch_id = adurl[subs:]
             watch_id = urlparse.urlparse(watch_id).query
-            try: serie_info = re.search('(\d+)\.?\s+epiz', item[1]).group(1).encode('utf-8')
+            try: serie_info = re.search('(\d+)\.?\s+epiz', py2_encode(item[1]).group(1))
             except: serie_info = '-1'
             if not serie_info == '-1':
                 downloaded_name = foldertitle + ' ' + serie_info + '. epizod'
@@ -676,27 +708,27 @@ def build_movie_links(foldername, foldertitle, folderimage):
             url_conf = {'mode': 'find_directurl', 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload' : ' ', 'meta' : meta, 'debrid': item[2]}
             url = build_url(url_conf)
             url_conf = {'mode': 'find_directurl', 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload' : 'DOWNLOAD', 'meta' : meta, 'debrid': item[2]}
-            download_args = '?' + urllib.urlencode(url_conf)
+            download_args = '?' + urlencode(url_conf)
 
             try:
                 info = client.parseDOM(item[1], 'div', attrs={'class': 'col-sm-4 col-xs-12'})[0]
                 info = client.replaceHTMLCodes(info)
-                info = info.strip().encode('utf-8')
+                info = py2_encode(info.strip())
             except:
                 info = ''
 
             lang = client.parseDOM(item[1], 'li', ret='class')[0]
             qual = client.parseDOM(item[1], 'li', ret='title')[1]
-            movie_info = decode_movie_info(lang.strip().encode('utf-8'), qual.strip().encode('utf-8'))
+            movie_info = decode_movie_info(py2_encode(lang.strip()), py2_encode(qual.strip()))
 
             if not serie_info == '-1':
                 content = 'episodes'
-                li = xbmcgui.ListItem(serie_info + u'. epiz\xF3d'.encode('utf-8') + movie_info + ' | ' + host.upper(),
-                                    iconImage=folderimage)
+                li = xbmcgui.ListItem(serie_info + py2_encode(u'. epiz\xF3d') + movie_info + ' | ' + host.upper())
+                li.setArt({'icon': folderimage})
             else:
                 content = 'movies'
-                li = xbmcgui.ListItem(movie_info + ' | ' + host.upper() + '[COLOR cyan] %s[/COLOR]' % info,
-                                    iconImage=folderimage)
+                li = xbmcgui.ListItem(movie_info + ' | ' + host.upper() + '[COLOR cyan] %s[/COLOR]' % info)
+                li.setArt({'icon': folderimage})
             file_data = watch_id + '=spl=' + foldertitle + '=spl=' + folderimage
             if file_data in watched_file_data:
                 meta.update({ "Title": foldertitle + folderimage, 'playcount': 1, 'overlay': 7})
@@ -710,13 +742,13 @@ def build_movie_links(foldername, foldertitle, folderimage):
             li.setProperty('IsPlayable', 'true')
 
             url_conf1 = {'mode': 'queueItem'}
-            favourite_args1 = '?' + urllib.urlencode(url_conf1)
+            favourite_args1 = '?' + urlencode(url_conf1)
 
             url_conf2 = {'mode': 'favourite', 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'ADDW', 'pagenum' : '0'}
-            favourite_args2 = '?' + urllib.urlencode(url_conf2)
+            favourite_args2 = '?' + urlencode(url_conf2)
 
             url_conf3 = {'mode': 'favourite', 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'REMOVEW', 'pagenum' : '0'}
-            favourite_args3 = '?' + urllib.urlencode(url_conf3)
+            favourite_args3 = '?' + urlencode(url_conf3)
 
             li.addContextMenuItems([ (u'Vide\xF3 Let\xF6lt\xE9se', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + download_args + ')'),
 			(u'Hozz\xE1ad\xE1s a lej\xE1tsz\xE1si list\xE1hoz', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + favourite_args1 + ')'),
@@ -740,7 +772,6 @@ def getConstants():
         hostDict = [i.domains for i in hosts if not '*' in i.domains]
         hostDict = [i.lower() for i in reduce(lambda x, y: x+y, hostDict)]
         hostDict = list(set(hostDict))
-
     except:
         hostDict = []
     return hostDict
@@ -804,7 +835,7 @@ def build_file(foldername, foldertitle, movieinfo, function, pagenum, traktid):
 args = urlparse.parse_qs(sys.argv[2][1:])
 
 def build_url(query):
-    return base_url + '?' + urllib.urlencode(query)
+    return base_url + '?' + urlencode(query)
 
 def log(msg, level=xbmc.LOGDEBUG):
     xbmc.log('### [%s] - %s' % (addonID, msg), level=level)

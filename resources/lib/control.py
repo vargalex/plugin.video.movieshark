@@ -5,17 +5,13 @@ import os,xbmc,xbmcaddon,xbmcplugin,xbmcgui,xbmcvfs
 
 integer = 1000
 
-thisAddon = xbmcaddon.Addon(id='plugin.video.movieshark')
+lang = xbmcaddon.Addon().getLocalizedString
 
-lang = xbmcaddon.Addon(id='plugin.video.movieshark').getLocalizedString
+setting = xbmcaddon.Addon().getSetting
 
-setting = xbmcaddon.Addon(id='plugin.video.movieshark').getSetting
+setSetting = xbmcaddon.Addon().setSetting
 
-setSetting = xbmcaddon.Addon(id='plugin.video.movieshark').setSetting
-
-addon = xbmcaddon.Addon(id='plugin.video.movieshark')
-
-#addon = xbmcaddon.Addon
+addon = xbmcaddon.Addon
 
 addItem = xbmcplugin.addDirectoryItem
 
@@ -27,9 +23,7 @@ content = xbmcplugin.setContent
 
 property = xbmcplugin.setProperty
 
-addonInfo = xbmcaddon.Addon(id='plugin.video.movieshark').getAddonInfo
-
-#addonInfo = xbmcaddon.Addon().getAddonInfo
+addonInfo = xbmcaddon.Addon().getAddonInfo
 
 infoLabel = xbmc.getInfoLabel
 
@@ -77,7 +71,16 @@ skinPath = xbmc.translatePath('special://skin/')
 
 addonPath = xbmc.translatePath(addonInfo('path'))
 
-dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+try:
+    dataPath = xbmc.translatePath(addonInfo('profile')).decode('utf-8')
+except:
+    dataPath = xbmc.translatePath(addonInfo('profile'))
+
+playlistFile = os.path.join(dataPath, 'playlist.db')
+
+favoritesFile = os.path.join(dataPath, 'favorites.db')
+
+playcountFile = os.path.join(dataPath, 'playcount.db')
 
 cacheFile = os.path.join(dataPath, 'cache.db')
 
@@ -94,9 +97,12 @@ def addonIcon():
     try: return os.path.join(addonInfo('path'), 'icon.png')
     except: pass
 
-
 def addonFanart():
     try: return os.path.join(addonInfo('path'), 'fanart.jpg')
+    except: pass
+
+def artPath():
+    try: return os.path.join(addonInfo('path'), 'resources', 'media')
     except: pass
 
 
@@ -105,10 +111,8 @@ def infoDialog(message, heading=addonInfo('name'), icon='', time=3000):
     try: dialog.notification(heading, message, icon, time, sound=False)
     except: execute("Notification(%s,%s, %s, %s)" % (heading, message, time, icon))
 
-
 def okDialog(heading, line1):
     return dialog.ok(heading, line1)
-
 
 def yesnoDialog(line1, line2, line3, heading=addonInfo('name'), nolabel='', yeslabel=''):
     return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
@@ -143,7 +147,6 @@ def openSettings(query=None, id=addonInfo('id')):
 def openPlaylist():
     return execute('ActivateWindow(VideoPlaylist)')
 
-
 def refresh():
     return execute('Container.Refresh')
 
@@ -159,11 +162,7 @@ def busy():
 def queueItem():
     return execute('Action(Queue)')
 
-
-def openPlaylist():
-    return execute('ActivateWindow(VideoPlaylist)')
-
-
 def getCurrentViewId():
     win = xbmcgui.Window(xbmcgui.getCurrentWindowId())
     return str(win.getFocusId())
+

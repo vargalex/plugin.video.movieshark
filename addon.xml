@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.movieshark" name="Movie Shark" version="2.1.9" provider-name="Murdock - vazzemiko">
+<addon id="plugin.video.movieshark" name="Movie Shark" version="2.2.0" provider-name="Murdock - vazzemiko">
 	<requires>
-		<import addon="xbmc.python" version="2.1.0"/>
-		<import addon="script.module.resolveurl" version="5.0.00"/>
+		<import addon="script.module.urlresolver" version="5.0.0"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="default.py">
 		<provides>video</provides>
@@ -14,7 +13,10 @@
 		<description lang="hu">Nézd meg a legfrissebb filmeket és sorozatokat a Movie Shark segítségével. Ez az első Kodi kiegészítő amivel egyszerűen férhetsz hozzá magyar nyelvű vagy magyar feliratos tartalmakhoz. Itt nincsenek idegesítő reklámok és felugráló ablakok. Használhatod bármilyen eszközön, ahol a Kodi elérhető.</description>
 		<description lang="en">Nézd meg a legfrissebb filmeket és sorozatokat a Movie Shark segítségével. Ez az első Kodi kiegészítő amivel egyszerűen férhetsz hozzá magyar nyelvű vagy magyar feliratos tartalmakhoz. Itt nincsenek idegesítő reklámok és felugráló ablakok. Használhatod bármilyen eszközön, ahol a Kodi elérhető.</description>
 		<news>
-- settingsorig.xml módosítás
+- Domain változás
 		</news>
+		<assets>
+		  <icon>icon.png</icon>
+		</assets>
 	</extension>
 </addon>

@@ -18,14 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 """
 
-
+import xbmcgui
 try:
-    import resolveurl as urlresolver
+    import urlresolver
 
     debrid_resolvers = [resolver() for resolver in urlresolver.relevant_resolvers(order_matters=True) if resolver.isUniversal()]
 except:
     debrid_resolvers = []
-
 
 def status():
     return debrid_resolvers != []

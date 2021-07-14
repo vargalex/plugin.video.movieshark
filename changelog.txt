@@ -1,4 +1,7 @@
-﻿[B]2.1.8[/B]
+﻿[B]2.1.9[/B]
+- settingsorig.xml módosítás
+
+[B]2.1.8[/B]
 - Domain változás követése
 
 [B]2.1.7[/B]

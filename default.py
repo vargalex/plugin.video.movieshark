@@ -1,5 +1,5 @@
 import os, sys, re, xbmcaddon, xbmcgui, xbmcplugin, shutil, json, datetime
-import urlresolver
+import resolveurl as urlresolver
 
 from resources.lib import client
 from resources.lib import control

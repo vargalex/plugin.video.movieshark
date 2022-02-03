@@ -1,5 +1,11 @@
-﻿[B]2.1.10[/B]
+﻿[B]2.2.2[/B]
+- Ékezetes keresés javítása
+
+[B]2.2.1[/B]
 - Átállás resolveurl-re
+
+[B]2.2.0[/B]
+- Domain változás
 
 [B]2.1.9[/B]
 - settingsorig.xml módosítás

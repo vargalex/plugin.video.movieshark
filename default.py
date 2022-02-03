@@ -10,7 +10,7 @@ from resources.lib import debrid
 from resources.lib.utils import py2_encode, py2_decode
 
 if sys.version_info[0] == 3:
-    from urllib.parse import urlencode, unquote
+    from urllib.parse import urlencode, unquote, quote_plus
     import urllib.parse as urlparse
     from functools import reduce
 else:
@@ -330,7 +330,7 @@ def build_movie_directory(foldername, pagenum, action):
         else:
             mfyear = 0
 
-        top_url = base_filmezz + '/kereses.php?p=' + pagenum + '&s=' + msearch.replace(' ','+') + '&w=0&o=' + msort + '&q=' + quality_set[mquality] + '&l=' + language_set[mlanguage] + '&e=' + str(mfyear) + '&c=' + category_set[mcategory][0] + '&t=' + str(mtype) + '&h=0'
+        top_url = base_filmezz + '/kereses.php?p=' + pagenum + '&s=' + quote_plus(msearch) + '&w=0&o=' + msort + '&q=' + quality_set[mquality] + '&l=' + language_set[mlanguage] + '&e=' + str(mfyear) + '&c=' + category_set[mcategory][0] + '&t=' + str(mtype) + '&h=0'
 
         url_content = client.request(top_url)
         if not url_content:
@@ -452,7 +452,7 @@ def build_movie_directory(foldername, pagenum, action):
             search_text = open_search_panel()
 
         if search_text != '':
-            top_url = base_filmezz + '/kereses.php?s=' + search_text.replace(' ','+') + '&o=' + str(msort)
+            top_url = base_filmezz + '/kereses.php?s=' + quote_plus(search_text) + '&o=' + str(msort)
 
             url_content = client.request(top_url)
             if not url_content:

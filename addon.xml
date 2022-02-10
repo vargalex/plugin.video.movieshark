@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.movieshark" name="Movie Shark" version="2.2.2" provider-name="Murdock - vazzemiko">
+<addon id="plugin.video.movieshark" name="Movie Shark" version="2.2.3" provider-name="Murdock - vazzemiko">
 	<requires>
 		<import addon="script.module.resolveurl" version="5.1.00"/>
 	</requires>
@@ -13,7 +13,7 @@
 		<description lang="hu">Nézd meg a legfrissebb filmeket és sorozatokat a Movie Shark segítségével. Ez az első Kodi kiegészítő amivel egyszerűen férhetsz hozzá magyar nyelvű vagy magyar feliratos tartalmakhoz. Itt nincsenek idegesítő reklámok és felugráló ablakok. Használhatod bármilyen eszközön, ahol a Kodi elérhető.</description>
 		<description lang="en">Nézd meg a legfrissebb filmeket és sorozatokat a Movie Shark segítségével. Ez az első Kodi kiegészítő amivel egyszerűen férhetsz hozzá magyar nyelvű vagy magyar feliratos tartalmakhoz. Itt nincsenek idegesítő reklámok és felugráló ablakok. Használhatod bármilyen eszközön, ahol a Kodi elérhető.</description>
 		<news>
-- Ékezetes keresés javítása
+- Leia bugfix + Nexus kompatibilitás
 		</news>
 		<assets>
 		  <icon>icon.png</icon>

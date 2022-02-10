@@ -1,4 +1,7 @@
-﻿[B]2.2.2[/B]
+﻿[B]2.2.3[/B]
+- Leia bugfix + Nexus kompatibilitás
+
+[B]2.2.2[/B]
 - Ékezetes keresés javítása
 
 [B]2.2.1[/B]

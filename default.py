@@ -14,19 +14,19 @@ if sys.version_info[0] == 3:
     import urllib.parse as urlparse
     from functools import reduce
 else:
-    from urllib import urlencode, unquote
+    from urllib import urlencode, unquote, quote_plus
     import urlparse
 
 base_url = sys.argv[0]
 addon_handle = int(sys.argv[1])
-thisAddon = xbmcaddon.Addon(id='plugin.video.movieshark')
+thisAddon = control.addon(id='plugin.video.movieshark')
 addonID = thisAddon.getAddonInfo('id')
-thisAddonDir = py2_decode(xbmc.translatePath(thisAddon.getAddonInfo('path')))
+thisAddonDir = py2_decode(control.translatePath(thisAddon.getAddonInfo('path')))
 sys.path.append(os.path.join(thisAddonDir, 'resources', 'lib'))
 sys.path.append(os.path.join(thisAddonDir, 'resources', 'media'))
-MediaDir = py2_decode(xbmc.translatePath(os.path.join(thisAddonDir, 'resources', 'media')))
-SettingsDir = py2_decode(xbmc.translatePath(os.path.join(thisAddonDir, 'resources')))
-UserDataDir = py2_decode(xbmc.translatePath(thisAddon.getAddonInfo('profile')))
+MediaDir = py2_decode(control.translatePath(os.path.join(thisAddonDir, 'resources', 'media')))
+SettingsDir = py2_decode(control.translatePath(os.path.join(thisAddonDir, 'resources')))
+UserDataDir = py2_decode(control.translatePath(thisAddon.getAddonInfo('profile')))
 
 
 if sys.platform == 'win32':

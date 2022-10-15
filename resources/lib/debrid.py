@@ -20,7 +20,7 @@
 
 import xbmcgui
 try:
-    import urlresolver
+    import resolveurl as urlresolver
 
     debrid_resolvers = [resolver() for resolver in urlresolver.relevant_resolvers(order_matters=True) if resolver.isUniversal()]
 except:

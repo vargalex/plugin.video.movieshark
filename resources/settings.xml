@@ -10,7 +10,7 @@
         <setting label="Év" type="bool" id="myear" default="false"/>
         <setting label="Bemutatás éve" type="number" id="mfyear" subsetting="true" option="int" visible="!eq(-1,false)" default="1950"/>
         <setting label="Weboldal beállítás" type="lsep"/>
-        <setting label="Weboldal címe:" type="text" id="base_filmezz" default="https://filmezz.co"/>
+        <setting label="Weboldal címe:" type="text" id="base_filmezz" default="https://filmezz.club"/>
 		<setting id="clear_meta" type="action" label="[COLOR blue]Meta adatok törlése[/COLOR]" default="" action="RunPlugin(plugin://plugin.video.movieshark/?mode=clear_meta)"/>
     </category>
     <category label="Megjelenítés">

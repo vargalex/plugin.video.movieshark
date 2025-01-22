@@ -62,8 +62,6 @@ category_set = [['0', '0'], ['18', '18+'], ['akcio', u'Akci\xF3'], ['animacio', 
                 ['krimi', 'Krimi'], ['misztikus', 'Misztikus'], ['romantikus', 'Romantikus'], ['sci-fi', 'Sci-Fi'], ['sorozat', 'Sorozat'], ['sport', 'Sport'], ['thriller', 'Thriller'], ['tortenelmi', u'T\xF6rt\xE9nelmi'], ['vigjatek', u'V\xEDgj\xE1t\xE9k'], ['western', 'Western'], ['zenes', u'Zen\xE9s']]
 
 base_filmezz = control.setting('base_filmezz')
-tarhely_filmezz = control.setting('tarhely_filmezz')
-
 
 def decode_movie_info(lang, qual):
     l = lang.lower()
@@ -572,7 +570,7 @@ def build_movie_directory(foldername, pagenum, action):
     return
 
 
-def find_videourl(foldername, foldertitle, folderimage, isdownload, meta, dname):
+def find_videourl(tarhelyurl, foldername, foldertitle, folderimage, isdownload, meta, dname):
     if control.setting('savefolder') in ['', 'Nincs megadva!'] and isdownload == 'DOWNLOAD':
         xbmcgui.Dialog().ok(u'Let\xF6lt\xE9si hiba', u'Meg kell adnod egy let\xF6lt\xE9si k\xF6nyvt\xE1rat a be\xE1ll\xEDt\xE1sokban!')
         return
@@ -588,7 +586,7 @@ def find_videourl(foldername, foldertitle, folderimage, isdownload, meta, dname)
     except:
         year = '0'
 
-    u = client.request('{0}/link_to.php?{1}'.format(tarhely_filmezz, foldername), output='geturl')
+    u = client.request('{0}/link_to.php?{1}'.format(tarhelyurl, foldername), output='geturl')
     log('MS HOST URL: {} '.format(py2_encode(u)))
 
     direct_url = None
@@ -658,6 +656,7 @@ def build_movie_links(foldername, foldertitle, folderimage):
     parsedButtons = client.parseDOM(url_content, 'section', attrs={'class': 'content-box'})
     parsedButtons = client.parseDOM(parsedButtons, 'a', ret='href')
     query = [i for i in parsedButtons if '/index.php?id=' + vid_id in i][0]
+    tarhely_url = urlparse.urlparse(query)._replace(path="", query=None).geturl()
     r = client.request(query)
     r = client.parseDOM(r, 'ul', attrs={'class': 'list-unstyled table-horizontal url-list'})[0]
     items = client.parseDOM(r, 'li')
@@ -726,9 +725,9 @@ def build_movie_links(foldername, foldertitle, folderimage):
                 meta.update({'tvshowtitle': meta['title'], 'type': 'episode', 'season': tseason, 'mediatype': 'episode', 'episode': serie_info})
             else:
                 downloaded_name = foldertitle
-            url_conf = {'mode': 'find_directurl', 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload': ' ', 'meta': meta, 'debrid': item[2]}
+            url_conf = {'mode': 'find_directurl', 'tarhelyurl': tarhely_url, 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload': ' ', 'meta': meta, 'debrid': item[2]}
             url = build_url(url_conf)
-            url_conf = {'mode': 'find_directurl', 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload': 'DOWNLOAD', 'meta': meta, 'debrid': item[2]}
+            url_conf = {'mode': 'find_directurl', 'tarhelyurl': tarhely_url, 'foldername': watch_id, 'title': downloaded_name, 'image': folderimage, 'isdownload': 'DOWNLOAD', 'meta': meta, 'debrid': item[2]}
             download_args = '?' + urlencode(url_conf)
 
             try:
@@ -765,10 +764,10 @@ def build_movie_links(foldername, foldertitle, folderimage):
             url_conf1 = {'mode': 'queueItem'}
             favourite_args1 = '?' + urlencode(url_conf1)
 
-            url_conf2 = {'mode': 'favourite', 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'ADDW', 'pagenum': '0'}
+            url_conf2 = {'mode': 'favourite', 'tarhelyurl': tarhely_url, 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'ADDW', 'pagenum': '0'}
             favourite_args2 = '?' + urlencode(url_conf2)
 
-            url_conf3 = {'mode': 'favourite', 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'REMOVEW', 'pagenum': '0'}
+            url_conf3 = {'mode': 'favourite', 'tarhelyurl': tarhely_url, 'foldername': watch_id, 'title': foldertitle, 'info': folderimage, 'function': 'REMOVEW', 'pagenum': '0'}
             favourite_args3 = '?' + urlencode(url_conf3)
 
             li.addContextMenuItems([(u'Vide\xF3 Let\xF6lt\xE9se', 'XBMC.RunScript(' + download_script + ',' + str(addon_handle) + ',' + download_args + ')'),
@@ -941,7 +940,7 @@ elif mode[0] == 'favourite':
 
 elif mode[0] == 'find_directurl':
 
-    find_videourl(args['foldername'][0], args['title'][0], args['image'][0], args['isdownload'][0], args['meta'][0], args['debrid'][0])
+    find_videourl(args['tarhelyurl'][0], args['foldername'][0], args['title'][0], args['image'][0], args['isdownload'][0], args['meta'][0], args['debrid'][0])
 
 elif mode[0] == 'trailer':
 

@@ -98,7 +98,8 @@ def get(title, url):
             pass
 
         try:
-            poster = client.parseDOM(result, 'img', ret = 'src')[0]
+            poster = client.parseDOM(result, 'div', attrs = {'class': '.+?cover'})[0]
+            poster = client.parseDOM(poster, 'img', ret = 'src')[0]
             poster = urlparse.urljoin(base_filmezz, poster)
             poster = poster.encode('utf-8')
         except:

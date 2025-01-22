@@ -119,7 +119,8 @@ def okDialog(heading, line1):
     return dialog.ok(heading, line1)
 
 def yesnoDialog(line1, line2, line3, heading=addonInfo('name'), nolabel='', yeslabel=''):
-    return dialog.yesno(heading, line1, line2, line3, nolabel, yeslabel)
+    message = "\n".append([line1, line2, line3])
+    return dialog.yesno(heading, message, nolabel=nolabel, yeslabel=yeslabel)
 
 
 def selectDialog(list, heading=addonInfo('name')):

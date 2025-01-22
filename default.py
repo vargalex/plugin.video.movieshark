@@ -62,6 +62,7 @@ category_set = [['0', '0'], ['18', '18+'], ['akcio', u'Akci\xF3'], ['animacio', 
                 ['krimi', 'Krimi'], ['misztikus', 'Misztikus'], ['romantikus', 'Romantikus'], ['sci-fi', 'Sci-Fi'], ['sorozat', 'Sorozat'], ['sport', 'Sport'], ['thriller', 'Thriller'], ['tortenelmi', u'T\xF6rt\xE9nelmi'], ['vigjatek', u'V\xEDgj\xE1t\xE9k'], ['western', 'Western'], ['zenes', u'Zen\xE9s']]
 
 base_filmezz = control.setting('base_filmezz')
+tarhely_filmezz = control.setting('tarhely_filmezz')
 
 
 def decode_movie_info(lang, qual):
@@ -587,7 +588,7 @@ def find_videourl(foldername, foldertitle, folderimage, isdownload, meta, dname)
     except:
         year = '0'
 
-    u = client.request('{0}/link_to.php?{1}'.format(base_filmezz, foldername), output='geturl')
+    u = client.request('{0}/link_to.php?{1}'.format(tarhely_filmezz, foldername), output='geturl')
     log('MS HOST URL: {} '.format(py2_encode(u)))
 
     direct_url = None
